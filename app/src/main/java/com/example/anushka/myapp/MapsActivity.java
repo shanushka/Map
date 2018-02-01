@@ -42,10 +42,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ArrayList<Coordinates> coordinates;
-    Double sLat = 0.00;
-    Double sLang = 0.00;
-    Double dLat = 0.00;
-    Double dLang = 0.00;
     int count = 0;
 
 
@@ -62,22 +58,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         jsonRequest();
     }
 
+    Double gLat = 0.00;
+    Double gLang = 0.00;
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        updateMap(sLat, sLang, dLat, dLang);
+        updateMap(gLat, gLang);
     }
 
-    private void updateMap(Double sourceLat, Double sourcelang, Double destLat, Double destLang) {
+    private void updateMap(Double sourceLat, Double sourcelang) {
 
-        LatLng source = new LatLng(sourceLat, sourcelang);
-        mMap.addMarker(new MarkerOptions().position(source));
+        LatLng barcelona = new LatLng(27.2799985, 87.2549809);
+        mMap.addMarker(new MarkerOptions().position(barcelona));
 
-        LatLng destination = new LatLng(destLat, destLang);
-        mMap.addMarker(new MarkerOptions().position(source));
+        LatLng madrid = new LatLng(27.2786661, 87.2460987);
+        mMap.addMarker(new MarkerOptions().position(madrid));
 
-        LatLng zaragoza = new LatLng(sourceLat, sourcelang);
+        LatLng zaragoza = new LatLng(27.7172, 85.3240);
 
         //Define list to get all latlng for the route
         List<LatLng> path = new ArrayList();
@@ -87,7 +86,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GeoApiContext context = new GeoApiContext.Builder()
                 .apiKey(getResources().getString(R.string.google_maps_key))
                 .build();
-        DirectionsApiRequest req = DirectionsApi.getDirections(context, sourceLat + "," + sourcelang, destLat + "," + destLang);
+        DirectionsApiRequest req = DirectionsApi.getDirections(context, barcelona.latitude + "," + barcelona.longitude, madrid.latitude + "," + madrid.longitude);
 
         try {
             DirectionsResult res = req.await();
@@ -133,12 +132,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("map", ex.getLocalizedMessage());
         }
 
-        //Draw the polyline
-        if (path.size() > 0) {
-            PolylineOptions opts = new PolylineOptions().addAll(path).color(Color.BLUE).width(5);
-            mMap.addPolyline(opts);
+        if (count < 100) {
+            //Draw the polyline
+            if (path.size() > 0) {
+                PolylineOptions opts = new PolylineOptions().addAll(path).color(Color.RED).width(5);
+                mMap.addPolyline(opts);
+            }
+        } else {
+            if (path.size() > 0) {
+                PolylineOptions opts = new PolylineOptions().addAll(path).color(Color.YELLOW).width(5);
+                mMap.addPolyline(opts);
+            }
         }
-
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(zaragoza, 6));
@@ -156,16 +161,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Type listType = new TypeToken<ArrayList<Coordinates>>() {
                         }.getType();
                         coordinates = gson.fromJson(jsonOutput, listType);
-                        sLat =27.693944;
-                        sLang =85.2958331;
-                        dLat =27.693944;
-                        dLang =85.2958331;
-
-//                        sLat = coordinates.get(0).getLat();
-//                        sLang = coordinates.get(0).getLang();
-//                        dLat = coordinates.get(1).getLat();
-//                        dLang = coordinates.get(1).getLang();
-                        updateMap(sLat, sLang, dLat, dLang);
+                        gLat = coordinates.get(0).getLat();
+                        gLang = coordinates.get(0).getLang();
+                        updateMap(gLat, gLang);
+                        count = coordinates.get(0).getVechicleCount();
 
 
                     }
