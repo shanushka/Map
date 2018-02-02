@@ -1,4 +1,4 @@
-package com.example.anushka.myapp.model;
+package com.anushka.myapp.model;
 
 /**
  * Created by Anushka on 1/31/2018.

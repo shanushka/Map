@@ -1,4 +1,4 @@
-package com.example.anushka.myapp.volley;
+package com.anushka.myapp.volley;
 
 import android.app.Application;
 import android.content.Context;
